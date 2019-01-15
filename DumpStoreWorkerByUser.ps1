@@ -9,6 +9,7 @@ param(
 [string]$user
 )
 
+
 # Load module and run StoreQuery against specified mailbox:
 . "$env:ExchangeInstallPath\scripts\ManagedStoreDiagnosticFunctions.ps1"
 
@@ -19,7 +20,10 @@ Get-StoreQuery -Database $mdb -query "SELECT * from ThreadDiagnosticInfo where M
 # Get PID of DB store worker process
 $workerId = (Get-MailboxDatabase $mdb -status).WorkerProcessId
 
-#Trigger Procdump of store worker
-c:\temp\procdump\procdump.exe -mp -s 60 -n 3 $workerId c:\temp\procdump
+Write-Host "Store worker process ID for $mdb is $workerId"
 
-Write-Host "All work is done. $user.xml and process dump files have been saved to c:\temp\procdump"
+#Trigger Procdump of store worker
+& "c:\temp\procdump\.\procdump.exe" -mp -s 60 -n 3 $workerId c:\temp\procdump
+
+Write-Host -ForegroundColor Gray  "$user.xml and dump files have been saved to c:\temp\procdump"
+Write-Host -ForegroundColor Yellow "All work is done."
